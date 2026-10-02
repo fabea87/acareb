@@ -271,3 +271,7 @@ input:focus, select:focus, textarea:focus {
   z-index: 50 !important;
   border-radius: 0 !important;
 }
+
+.fullscreen-canvas #graph-drawer {
+  z-index: 60 !important;
+}

@@ -131,10 +131,27 @@
       </div>
 
       <div id="graph-container" class="relative w-full h-[620px] rounded-xl glass-panel overflow-hidden graph-canvas-container">
+        
+        <!-- Floating Canvas Controls Island (Always visible, especially in Fullscreen) -->
+        <div class="absolute top-4 right-4 z-30 flex items-center gap-2 bg-[var(--card-bg)]/95 backdrop-blur-md p-1.5 rounded-lg border border-[var(--card-border)] shadow-md">
+          <button onclick="window.resetGraphZoom()" class="px-2.5 py-1 rounded btn-neutral text-xs flex items-center gap-1" title="居中并重置视图">
+            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+            <span class="hidden sm:inline">居中</span>
+          </button>
+          <button onclick="window.toggleSimulation()" id="btn-toggle-sim" class="px-2.5 py-1 rounded btn-neutral text-xs flex items-center gap-1" title="固定/释放引力">
+            <i data-lucide="pause" class="w-3.5 h-3.5"></i>
+            <span id="sim-btn-text" class="hidden sm:inline">固定引力</span>
+          </button>
+          <button onclick="window.toggleGraphFullscreen()" id="btn-graph-fullscreen" class="px-3 py-1 rounded btn-terracotta text-xs font-semibold flex items-center gap-1 transition-all" title="全屏沉浸模式 (ESC退出)">
+            <i data-lucide="maximize" id="fullscreen-icon" class="w-3.5 h-3.5"></i>
+            <span id="fullscreen-btn-text">全屏</span>
+          </button>
+        </div>
+
         <svg id="graph-svg" class="w-full h-full cursor-grab active:cursor-grabbing"></svg>
-        <div class="absolute bottom-4 left-4 pointer-events-none text-xs text-[var(--text-secondary)] bg-[var(--card-bg)] px-3 py-1.5 rounded-lg border border-[var(--card-border)] shadow-sm flex items-center gap-2">
+        <div class="absolute bottom-4 left-4 pointer-events-none text-xs text-[var(--text-secondary)] bg-[var(--card-bg)] px-3 py-1.5 rounded-lg border border-[var(--card-border)] shadow-sm flex items-center gap-2 z-10">
           <i data-lucide="mouse-pointer" class="w-3.5 h-3.5 text-[#DE7E5D]"></i>
-          <span>单击节点在右侧抽屉查看对应实战问答与金句；滚轮缩放画布，拖拽节点调整布局</span>
+          <span id="canvas-hint-text">单击节点在右侧抽屉查看对应实战问答与金句；滚轮缩放画布，拖拽节点调整布局</span>
         </div>
 
         <div id="graph-drawer" class="absolute top-0 right-0 h-full w-full sm:w-[440px] bg-[var(--card-bg)] border-l border-[var(--card-border)] p-5 transform translate-x-full transition-transform duration-300 ease-out z-20 flex flex-col gap-4 shadow-xl">

@@ -31,6 +31,13 @@ document.addEventListener("DOMContentLoaded", () => {
   initPreSubmissionScanner();
   loadStrategyVault();
   loadAnalytics();
+
+  // Listen for Escape key to exit fullscreen
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && isGraphFullscreen) {
+      toggleGraphFullscreen();
+    }
+  });
 });
 
 // View Switching
@@ -94,15 +101,22 @@ export function toggleCliModal() {
 
 export function toggleGraphFullscreen() {
   const container = document.getElementById('graph-container');
-  const btn = document.getElementById('btn-graph-fullscreen');
+  const btnText = document.getElementById('fullscreen-btn-text');
+  const btnIcon = document.getElementById('fullscreen-icon');
+  const hintText = document.getElementById('canvas-hint-text');
   isGraphFullscreen = !isGraphFullscreen;
   
   if (isGraphFullscreen) {
     container.classList.add('fullscreen-canvas');
-    btn.innerHTML = `<i data-lucide="minimize" class="w-3.5 h-3.5"></i><span>退出全屏</span>`;
+    if (btnText) btnText.innerText = "退出全屏 (ESC)";
+    if (btnIcon) btnIcon.setAttribute('data-lucide', 'minimize');
+    if (hintText) hintText.innerText = "全屏沉浸模式中 · 单击节点查看实战案例 · 按 ESC 键或点击右上角退出";
+    showToast("已进入全屏拓扑网络 (按 ESC 退出)");
   } else {
     container.classList.remove('fullscreen-canvas');
-    btn.innerHTML = `<i data-lucide="maximize" class="w-3.5 h-3.5"></i><span>全屏</span>`;
+    if (btnText) btnText.innerText = "全屏";
+    if (btnIcon) btnIcon.setAttribute('data-lucide', 'maximize');
+    if (hintText) hintText.innerText = "单击节点在右侧抽屉查看对应实战问答与金句；滚轮缩放画布，拖拽节点调整布局";
   }
   
   if (window.lucide) lucide.createIcons();
