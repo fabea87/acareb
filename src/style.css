@@ -1,0 +1,273 @@
+/* AcadRebuttal - Anthropic Warm Dark Palette (Exclusively Dark Mode) */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  /* ANTHROPIC WARM DARK PALETTE */
+  --bg-primary: #141311;          /* Warm obsidian brown-black */
+  --bg-secondary: #1C1A17;        /* Warm card dark */
+  --bg-tertiary: #24211D;         /* Muted component fill */
+  --header-bg: rgba(20, 19, 17, 0.94);
+  --card-bg: #1C1A17;
+  --card-border: #2C2924;         /* Subtle warm graphite border */
+  --card-shadow: 0 4px 16px -4px rgba(0, 0, 0, 0.5);
+  --card-hover-border: #423E38;
+
+  --text-primary: #F5F3EF;        /* Warm ivory white */
+  --text-secondary: #A39E93;      /* Quiet warm sand gray */
+  --text-muted: #6B665E;          /* Muted ash */
+
+  /* Anthropic Signature Terracotta Accent */
+  --accent-primary: #DE7E5D;      /* Warm Terracotta Coral */
+  --accent-primary-hover: #E89073;
+  --accent-primary-subtle: #2A1E1A;
+  --accent-primary-text: #F2A992;
+
+  --input-bg: #1A1916;
+  --input-border: #332F2A;
+  --input-text: #F5F3EF;
+  --input-focus-border: #DE7E5D;
+  --grid-dot-color: rgba(255, 255, 255, 0.05);
+
+  /* Critique (Reviewer): Quiet Burnt Terracotta */
+  --critique-bg: #221817;
+  --critique-border: #3D2522;
+  --critique-title: #E06C60;
+  --critique-text: #E8CAC7;
+
+  /* Response (Author): Muted Sage Green */
+  --response-bg: #172019;
+  --response-border: #243527;
+  --response-title: #5FA369;
+  --response-text: #CDE2D0;
+
+  /* Golden Move: Warm Ochre Parchment */
+  --golden-bg: #221D15;
+  --golden-border: #3D3425;
+  --golden-title: #D4A359;
+  --golden-text: #EFE2CB;
+
+  /* Graph Node Colors (Editorial Muted Minerals) */
+  --node-journal: #D4A359;        /* Warm amber */
+  --node-category: #68929E;       /* Slate teal */
+  --node-strategy: #DE7E5D;       /* Terracotta */
+  --node-keyword: #A88D9B;        /* Dusty rose slate */
+
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+/* Global Base */
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+  min-height: 100vh;
+  overflow-x: hidden;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Header */
+header {
+  background-color: var(--header-bg) !important;
+  border-bottom: 1px solid var(--card-border) !important;
+}
+
+/* Elegant Cards */
+.glass-panel {
+  background-color: var(--card-bg) !important;
+  border: 1px solid var(--card-border) !important;
+  box-shadow: var(--card-shadow) !important;
+  border-radius: 12px;
+}
+
+.glass-panel-hover {
+  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+.glass-panel-hover:hover {
+  transform: translateY(-1px);
+  border-color: var(--card-hover-border) !important;
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Nav Tabs */
+nav {
+  background-color: var(--bg-tertiary) !important;
+  border: 1px solid var(--card-border) !important;
+  border-radius: 10px;
+}
+.nav-btn {
+  color: var(--text-secondary) !important;
+  transition: all 0.18s ease;
+}
+.nav-btn:hover {
+  color: var(--text-primary) !important;
+  background-color: rgba(255, 255, 255, 0.04);
+}
+.nav-btn.active {
+  background-color: var(--bg-secondary) !important;
+  color: var(--accent-primary) !important;
+  border: 1px solid var(--card-border) !important;
+  font-weight: 600;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Mode Switcher Pill */
+.mode-pill {
+  display: inline-flex;
+  padding: 2px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+}
+.mode-option {
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  color: var(--text-secondary);
+}
+.mode-option:hover {
+  color: var(--text-primary);
+}
+.mode-option.active {
+  background: var(--bg-secondary);
+  color: var(--accent-primary) !important;
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Inputs, Selects and Textarea */
+input, select, textarea {
+  background-color: var(--input-bg) !important;
+  border: 1px solid var(--input-border) !important;
+  color: var(--input-text) !important;
+  border-radius: 8px;
+  transition: border-color 0.18s ease;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none !important;
+  border-color: var(--input-focus-border) !important;
+  box-shadow: 0 0 0 2px rgba(222, 126, 93, 0.15) !important;
+}
+
+/* Critique Box (Split View) */
+.critique-box {
+  background: var(--critique-bg) !important;
+  border: 1px solid var(--critique-border) !important;
+  border-radius: 10px;
+}
+.critique-box [class*="text-rose"],
+.critique-box .text-rose-400 {
+  color: var(--critique-title) !important;
+}
+.critique-box div, .critique-box p {
+  color: var(--critique-text) !important;
+}
+
+/* Response Box (Split View) */
+.response-box {
+  background: var(--response-bg) !important;
+  border: 1px solid var(--response-border) !important;
+  border-radius: 10px;
+}
+.response-box [class*="text-emerald"],
+.response-box .text-emerald-400 {
+  color: var(--response-title) !important;
+}
+.response-box div, .response-box p {
+  color: var(--response-text) !important;
+}
+
+/* Golden Box (Golden Move) */
+.golden-box {
+  background: var(--golden-bg) !important;
+  border: 1px solid var(--golden-border) !important;
+  border-radius: 10px;
+}
+.golden-box .text-amber-300,
+.golden-box [class*="text-amber-300"],
+.golden-box [class*="text-amber-400"] {
+  color: var(--golden-title) !important;
+}
+.golden-box .text-amber-100,
+.golden-box [class*="text-amber-100"],
+.golden-box [class*="text-amber-200"] {
+  color: var(--golden-text) !important;
+}
+
+/* Canvas Container */
+.graph-canvas-container {
+  background-color: var(--bg-primary) !important;
+  background-image: radial-gradient(var(--grid-dot-color) 1.2px, transparent 1.2px);
+  background-size: 24px 24px;
+}
+
+/* D3 Graph elements */
+.graph-link {
+  stroke-opacity: 0.35;
+  transition: stroke-opacity 0.2s ease, stroke-width 0.2s ease;
+}
+.graph-link.highlighted {
+  stroke-opacity: 0.95;
+}
+.graph-node {
+  cursor: pointer;
+}
+
+/* Terracotta Buttons */
+.btn-terracotta {
+  background-color: var(--accent-primary) !important;
+  color: #141311 !important;
+  font-weight: 600;
+  transition: background-color 0.18s ease;
+}
+.btn-terracotta:hover {
+  background-color: var(--accent-primary-hover) !important;
+}
+
+/* Secondary Neutral Buttons */
+.btn-neutral {
+  background-color: var(--bg-tertiary) !important;
+  border: 1px solid var(--card-border) !important;
+  color: var(--text-primary) !important;
+  border-radius: 8px;
+  transition: all 0.18s ease;
+}
+.btn-neutral:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  border-color: var(--card-hover-border) !important;
+}
+
+/* Toast */
+#toast {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 9999;
+  transform: translateY(100px);
+  opacity: 0;
+  background: var(--card-bg) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--card-border) !important;
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.6) !important;
+  border-radius: 10px;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+#toast.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* Fullscreen mode for Knowledge Network */
+.fullscreen-canvas {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 50 !important;
+  border-radius: 0 !important;
+}

@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AcadRebuttal · 顶刊返修语义检索与学术决策知识系统 (Client-Side Edition)</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- D3.js v7 CDN -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-[#DE7E5D] selection:text-black">
+
+  <!-- TOP APP BAR -->
+  <header class="sticky top-0 z-40 w-full backdrop-blur-md">
+    <div class="w-[85%] mx-auto h-16 flex items-center justify-between gap-4">
+      
+      <!-- Brand & Title -->
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-[#DE7E5D] flex items-center justify-center text-[#141311] font-serif font-bold text-lg shadow-sm">
+          A
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-base font-semibold tracking-tight text-[var(--text-primary)] flex items-center gap-2">
+              AcadRebuttal
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded border border-[var(--card-border)] bg-[var(--bg-tertiary)] text-[var(--text-secondary)] font-normal">
+                Vite · Client-Side JAMstack
+              </span>
+            </h1>
+          </div>
+          <p class="text-xs text-[var(--text-secondary)] hidden sm:block">顶级期刊论文审稿意见与返修决策纯前端检索知识库</p>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs (Editorial Styled) -->
+      <nav class="flex items-center p-1 rounded-xl text-xs sm:text-sm overflow-x-auto max-w-full">
+        <button id="tab-graph" onclick="window.switchView('graph')" class="nav-btn active flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all whitespace-nowrap">
+          <i data-lucide="git-fork" class="w-3.5 h-3.5"></i>
+          <span>知识网络</span>
+        </button>
+        <button id="tab-search" onclick="window.switchView('search')" class="nav-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all whitespace-nowrap">
+          <i data-lucide="search" class="w-3.5 h-3.5"></i>
+          <span>决策矩阵</span>
+        </button>
+        <button id="tab-studio" onclick="window.switchView('studio')" class="nav-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all whitespace-nowrap">
+          <i data-lucide="pen-tool" class="w-3.5 h-3.5 text-[#DE7E5D]"></i>
+          <span>返修起草工作台</span>
+          <span class="text-[9px] px-1.5 py-0.2 rounded bg-[var(--accent-primary-subtle)] text-[var(--accent-primary-text)] font-mono">4-Move</span>
+        </button>
+        <button id="tab-scanner" onclick="window.switchView('scanner')" class="nav-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all whitespace-nowrap">
+          <i data-lucide="shield-check" class="w-3.5 h-3.5 text-[#5FA369]"></i>
+          <span>投稿前排查自测</span>
+          <span class="text-[9px] px-1.5 py-0.2 rounded bg-[#172019] text-[#5FA369] font-mono border border-[#243527]">防御</span>
+        </button>
+        <button id="tab-vault" onclick="window.switchView('vault')" class="nav-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all whitespace-nowrap">
+          <i data-lucide="book-open" class="w-3.5 h-3.5"></i>
+          <span>兵法百宝箱</span>
+        </button>
+        <button id="tab-analytics" onclick="window.switchView('analytics')" class="nav-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all whitespace-nowrap">
+          <i data-lucide="bar-chart-2" class="w-3.5 h-3.5"></i>
+          <span>期刊洞察</span>
+        </button>
+      </nav>
+
+      <!-- Right Action Toolbar -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <button onclick="window.toggleBookmarkDrawer()" class="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg btn-neutral text-xs transition-all">
+          <i data-lucide="bookmark" class="w-3.5 h-3.5 text-[#DE7E5D]"></i>
+          <span class="hidden md:inline">灵感清单</span>
+          <span id="bookmark-badge" class="px-1.5 py-0.2 rounded-full bg-[#DE7E5D] text-[#141311] font-mono font-bold text-[10px]">0</span>
+        </button>
+        <button onclick="window.toggleCliModal()" class="p-2 rounded-lg btn-neutral transition-all" title="查看终端 CLI 极速命令 (方案 B)">
+          <i data-lucide="terminal" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- MAIN WRAPPER (85% Centered Width) -->
+  <main class="flex-1 w-[85%] mx-auto py-6 flex flex-col gap-6">
+
+    <!-- VIEW 1: KNOWLEDGE GRAPH VIEW -->
+    <section id="view-graph" class="view-panel flex flex-col flex-1 gap-4">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 glass-panel p-4">
+        <div class="flex items-center gap-3">
+          <div class="p-2 rounded-lg bg-[var(--accent-primary-subtle)] text-[#DE7E5D]">
+            <i data-lucide="share-2" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h2 class="text-sm sm:text-base font-semibold text-[var(--text-primary)] flex items-center gap-2">
+              全域返修攻防知识拓扑图谱
+              <span class="text-[11px] font-mono text-[var(--text-secondary)] font-normal">D3 Force Simulation (Pure JS)</span>
+            </h2>
+            <p class="text-xs text-[var(--text-secondary)]">将 13 种顶级期刊、8 大审稿核心痛点、6 大学术修辞招式与前沿术语自然互联</p>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2 text-xs font-medium">
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-[var(--card-border)] bg-[var(--bg-tertiary)] text-[var(--text-secondary)]">
+            <span class="w-2 h-2 rounded-full bg-[#D4A359]"></span> 期刊
+          </span>
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-[var(--card-border)] bg-[var(--bg-tertiary)] text-[var(--text-secondary)]">
+            <span class="w-2 h-2 rounded-full bg-[#68929E]"></span> 议题
+          </span>
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-[var(--card-border)] bg-[var(--bg-tertiary)] text-[var(--text-secondary)]">
+            <span class="w-2 h-2 rounded-full bg-[#DE7E5D]"></span> 招式
+          </span>
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-[var(--card-border)] bg-[var(--bg-tertiary)] text-[var(--text-secondary)]">
+            <span class="w-2 h-2 rounded-full bg-[#A88D9B]"></span> 术语
+          </span>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button onclick="window.resetGraphZoom()" class="px-3 py-1.5 rounded-lg btn-neutral text-xs flex items-center gap-1">
+            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+            <span>居中</span>
+          </button>
+          <button onclick="window.toggleSimulation()" id="btn-toggle-sim" class="px-3 py-1.5 rounded-lg btn-neutral text-xs flex items-center gap-1">
+            <i data-lucide="pause" class="w-3.5 h-3.5"></i>
+            <span>固定引力</span>
+          </button>
+          <button onclick="window.toggleGraphFullscreen()" id="btn-graph-fullscreen" class="px-3 py-1.5 rounded-lg btn-neutral text-xs flex items-center gap-1" title="全屏沉浸模式">
+            <i data-lucide="maximize" class="w-3.5 h-3.5"></i>
+            <span>全屏</span>
+          </button>
+        </div>
+      </div>
+
+      <div id="graph-container" class="relative w-full h-[620px] rounded-xl glass-panel overflow-hidden graph-canvas-container">
+        <svg id="graph-svg" class="w-full h-full cursor-grab active:cursor-grabbing"></svg>
+        <div class="absolute bottom-4 left-4 pointer-events-none text-xs text-[var(--text-secondary)] bg-[var(--card-bg)] px-3 py-1.5 rounded-lg border border-[var(--card-border)] shadow-sm flex items-center gap-2">
+          <i data-lucide="mouse-pointer" class="w-3.5 h-3.5 text-[#DE7E5D]"></i>
+          <span>单击节点在右侧抽屉查看对应实战问答与金句；滚轮缩放画布，拖拽节点调整布局</span>
+        </div>
+
+        <div id="graph-drawer" class="absolute top-0 right-0 h-full w-full sm:w-[440px] bg-[var(--card-bg)] border-l border-[var(--card-border)] p-5 transform translate-x-full transition-transform duration-300 ease-out z-20 flex flex-col gap-4 shadow-xl">
+          <div class="flex items-center justify-between border-b border-[var(--card-border)] pb-3">
+            <div class="flex items-center gap-2">
+              <span id="drawer-badge" class="px-2 py-0.5 rounded text-xs font-medium border border-[var(--card-border)] bg-[var(--bg-tertiary)]">
+                节点详情
+              </span>
+              <h3 id="drawer-title" class="font-bold text-sm text-[var(--text-primary)] truncate max-w-[240px]">
+                节点名称
+              </h3>
+            </div>
+            <button onclick="window.closeGraphDrawer()" class="p-1 rounded-lg text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] transition-all">
+              <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+          </div>
+
+          <div id="drawer-stats" class="text-xs text-[var(--text-secondary)] bg-[var(--bg-tertiary)] p-3 rounded-lg border border-[var(--card-border)] space-y-1"></div>
+
+          <div class="flex items-center gap-2">
+            <button id="drawer-filter-btn" class="flex-1 py-2 rounded-lg btn-terracotta text-xs font-semibold transition-all flex items-center justify-center gap-1.5">
+              <i data-lucide="filter" class="w-3.5 h-3.5"></i>
+              <span>在决策矩阵中聚焦此分类</span>
+            </button>
+          </div>
+
+          <div class="flex-1 overflow-y-auto pr-1 flex flex-col gap-3" id="drawer-cases-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 2: SEMANTIC SEARCH & DECISION MATRIX -->
+    <section id="view-search" class="view-panel hidden flex flex-col gap-6">
+      <div class="glass-panel p-6 rounded-xl flex flex-col gap-5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="flex items-center gap-2.5">
+            <div class="p-2 rounded-lg bg-[var(--accent-primary-subtle)] text-[#DE7E5D]">
+              <i data-lucide="search" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h2 class="text-base font-semibold text-[var(--text-primary)] flex items-center gap-2">
+                语义检索与回辩决策矩阵
+                <span class="text-[10px] font-mono text-[var(--text-secondary)] bg-[var(--bg-tertiary)] px-2 py-0.5 rounded border border-[var(--card-border)]">Pure JS BM25 + Cosine</span>
+              </h2>
+              <p class="text-xs text-[var(--text-secondary)]">输入新论文审稿意见或质疑点，纯前端毫秒级召回历史顶刊回辩实录与修辞对策</p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-[var(--text-secondary)] font-medium hidden sm:inline">检索算法:</span>
+            <div class="mode-pill">
+              <div id="mode-hybrid" onclick="window.setRetrievalMode('hybrid')" class="mode-option active">
+                智能混合 (Hybrid)
+              </div>
+              <div id="mode-semantic" onclick="window.setRetrievalMode('semantic')" class="mode-option">
+                深度语义 (TF-IDF)
+              </div>
+              <div id="mode-lexical" onclick="window.setRetrievalMode('lexical')" class="mode-option">
+                精准词法 (BM25)
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[var(--text-muted)]">
+            <i data-lucide="search" class="w-4 h-4"></i>
+          </div>
+          <input 
+            type="text" 
+            id="search-input" 
+            onkeydown="if(event.key==='Enter') window.executeSearch()"
+            placeholder="例如：How to address small sample size? / Theoretical framework lacks depth / Reviewer asking for 10 citations..."
+            class="w-full pl-11 pr-28 py-3 rounded-lg text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)]"
+          />
+          <button 
+            onclick="window.executeSearch()" 
+            class="absolute inset-y-1.5 right-1.5 px-4 rounded-md btn-terracotta text-xs font-semibold flex items-center gap-1.5 transition-all">
+            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            <span>检索</span>
+          </button>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2 pt-1">
+          <span class="text-xs text-[var(--text-secondary)] font-medium">典型学术疑难速查:</span>
+          <button onclick="window.setQueryAndSearch('The theoretical framework does not clearly ground the research questions')" class="text-xs px-2.5 py-1 rounded-md btn-neutral transition-all">
+            理论框架单薄/缺乏深度
+          </button>
+          <button onclick="window.setQueryAndSearch('Small sample size limits generalizability and statistical power')" class="text-xs px-2.5 py-1 rounded-md btn-neutral transition-all">
+            样本量小/外推性受限
+          </button>
+          <button onclick="window.setQueryAndSearch('Suggestion to add literature and references on automated feedback')" class="text-xs px-2.5 py-1 rounded-md btn-neutral transition-all">
+            审稿人塞文献/文献边界辩护
+          </button>
+          <button onclick="window.setQueryAndSearch('GenAI prompt templates and ethical guidelines are not provided')" class="text-xs px-2.5 py-1 rounded-md btn-neutral transition-all">
+            AI 提示词缺失与高校伦理政策
+          </button>
+          <button onclick="window.setQueryAndSearch('Discussion lacks critical argumentation on the underlying mechanisms')" class="text-xs px-2.5 py-1 rounded-md btn-neutral transition-all">
+            讨论缺乏批判性机制深度
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-2 border-t border-[var(--card-border)]">
+          <div>
+            <label class="text-[11px] text-[var(--text-secondary)] font-medium mb-1 block">期刊范围 (Journal)</label>
+            <select id="filter-journal" onchange="window.executeSearch()" class="w-full rounded-md px-2.5 py-1.5 text-xs text-[var(--text-primary)]">
+              <option value="ALL">全部顶级期刊 (All Journals)</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-[11px] text-[var(--text-secondary)] font-medium mb-1 block">审稿核心维度 (Category)</label>
+            <select id="filter-category" onchange="window.executeSearch()" class="w-full rounded-md px-2.5 py-1.5 text-xs text-[var(--text-primary)]">
+              <option value="ALL">全部分类 (All Categories)</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-[11px] text-[var(--text-secondary)] font-medium mb-1 block">学术修辞招式 (Strategy)</label>
+            <select id="filter-strategy" onchange="window.executeSearch()" class="w-full rounded-md px-2.5 py-1.5 text-xs text-[var(--text-primary)]">
+              <option value="ALL">全部策略 (All Strategies)</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-[11px] text-[var(--text-secondary)] font-medium mb-1 block">返修轮次 (Round)</label>
+            <select id="filter-round" onchange="window.executeSearch()" class="w-full rounded-md px-2.5 py-1.5 text-xs text-[var(--text-primary)]">
+              <option value="ALL">全部轮次 (All Rounds)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-1 text-xs text-[var(--text-secondary)]">
+        <div class="flex items-center gap-2">
+          <span id="results-count-text">正在检索匹配案例...</span>
+          <button onclick="window.clearSearchFilters()" class="text-[#DE7E5D] hover:underline ml-2">重置所有筛选</button>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="window.exportCurrentMarkdown()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg btn-neutral text-xs font-medium">
+            <i data-lucide="download" class="w-3.5 h-3.5 text-[#DE7E5D]"></i>
+            <span>导出 Markdown 专题手册 (.md)</span>
+          </button>
+        </div>
+      </div>
+
+      <div id="cards-container" class="flex flex-col gap-5"></div>
+    </section>
+
+    <!-- VIEW 3: REBUTTAL STUDIO (SUGGESTION 1 - 4-MOVE ASSEMBLER) -->
+    <section id="view-studio" class="view-panel hidden flex flex-col gap-6">
+      <div class="glass-panel p-6 rounded-xl flex flex-col gap-2">
+        <div class="flex items-center gap-3">
+          <div class="p-2 rounded-lg bg-[var(--accent-primary-subtle)] text-[#DE7E5D]">
+            <i data-lucide="pen-tool" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h2 class="text-base font-semibold text-[var(--text-primary)] flex items-center gap-2">
+              返修信起草工作台 · 4-Move 修辞动作组装器 (Rebuttal Studio)
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded border border-[var(--card-border)] bg-[var(--bg-tertiary)] text-[var(--text-secondary)] font-normal">Pure JS Move Assembler</span>
+            </h2>
+            <p class="text-xs text-[var(--text-secondary)]">输入新论文审稿意见，系统穿透审稿人隐性学术关切，基于过往发表高胜率金句在本地自动拼装标准 4 步法 Rebuttal Letter 草稿</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Left Column: Input (5 cols) -->
+        <div class="lg:col-span-5 flex flex-col gap-4">
+          <div class="glass-panel p-5 rounded-xl flex flex-col gap-4">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-[var(--text-primary)] flex items-center gap-1.5">
+                <i data-lucide="message-square" class="w-3.5 h-3.5 text-[#DE7E5D]"></i>
+                粘贴新审稿人意见 (Reviewer Critique)
+              </span>
+              <span class="text-[11px] font-mono text-[var(--text-muted)]">Input</span>
+            </div>
+
+            <textarea 
+              id="studio-critique-input" 
+              rows="7" 
+              placeholder="请在此粘贴新审稿人的具体批评意见。例如：&#10;What were the pre-study assessments on writing proficiency exactly? How do you ensure the groups were truly comparable before the intervention?"
+              class="w-full p-3 rounded-lg text-xs sm:text-[13px] leading-relaxed"
+            ></textarea>
+
+            <div class="flex flex-col gap-1.5">
+              <span class="text-[11px] text-[var(--text-secondary)] font-medium">快速载入典型学术刁难场景:</span>
+              <div class="flex flex-wrap gap-1.5">
+                <button onclick="window.setStudioPreset('sample_size')" class="text-[11px] px-2 py-1 rounded btn-neutral transition-all">
+                  样本量太少/外推受限
+                </button>
+                <button onclick="window.setStudioPreset('theoretical_framework')" class="text-[11px] px-2 py-1 rounded btn-neutral transition-all">
+                  理论框架单薄/缺乏深度
+                </button>
+                <button onclick="window.setStudioPreset('literature_addition')" class="text-[11px] px-2 py-1 rounded btn-neutral transition-all">
+                  审稿人强塞10篇文献
+                </button>
+                <button onclick="window.setStudioPreset('prompt_transparency')" class="text-[11px] px-2 py-1 rounded btn-neutral transition-all">
+                  GenAI提示词与伦理黑箱
+                </button>
+                <button onclick="window.setStudioPreset('discussion_mechanism')" class="text-[11px] px-2 py-1 rounded btn-neutral transition-all">
+                  讨论只复述结果无机制深度
+                </button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 pt-2 border-t border-[var(--card-border)]">
+              <div>
+                <label class="text-[11px] text-[var(--text-secondary)] font-medium mb-1 block">拟投/目标期刊风格</label>
+                <select id="studio-journal-select" class="w-full rounded-md px-2.5 py-1.5 text-xs text-[var(--text-primary)]">
+                  <option value="System">System (SSCI Q1 · 二语教学与AI)</option>
+                  <option value="Computer Assisted Language Learning (CALL)">CALL (SSCI Q1 · 技术机制对比)</option>
+                  <option value="Language Learning & Technology (LLT)">LLT (SSCI Q1 · 质性协作深描)</option>
+                  <option value="Humanities and Social Sciences Communications (HSSC)">HSSC (Nature · 跨学科案例)</option>
+                  <option value="Interactive Learning Environments (ILE)">ILE (SSCI Q1 · 学习环境实证)</option>
+                  <option value="ALL">通用顶级 SSCI 期刊风格</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-[11px] text-[var(--text-secondary)] font-medium mb-1 block">作者回辩基调偏好</label>
+                <select id="studio-strategy-select" class="w-full rounded-md px-2.5 py-1.5 text-xs text-[var(--text-primary)]">
+                  <option value="ALL">自适应匹配最佳历史招式</option>
+                  <option value="Concede & Expand">认同审稿人并大篇幅扩写</option>
+                  <option value="Polite Defense & Boundary">礼貌反驳并划定本研究边界</option>
+                  <option value="Methodological Fortification">方法与信效度数据加固</option>
+                </select>
+              </div>
+            </div>
+
+            <button onclick="window.executeAssembleDraft()" class="w-full py-2.5 rounded-lg btn-terracotta text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition-all mt-1">
+              <i data-lucide="sparkles" class="w-4 h-4"></i>
+              <span>穿透关切 & 组装 4-Move 返修信草稿</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Right Column: Output (7 cols) -->
+        <div class="lg:col-span-7 flex flex-col gap-4" id="studio-output-container">
+          <div id="studio-empty-state" class="glass-panel p-12 rounded-xl flex flex-col items-center justify-center text-center gap-3 h-full min-h-[460px]">
+            <div class="w-12 h-12 rounded-xl bg-[var(--bg-tertiary)] flex items-center justify-center text-[var(--text-muted)]">
+              <i data-lucide="scroll-text" class="w-6 h-6 text-[#DE7E5D]"></i>
+            </div>
+            <h3 class="text-sm font-semibold text-[var(--text-primary)]">等待组装学术返修信</h3>
+            <p class="text-xs text-[var(--text-secondary)] max-w-sm">在左侧输入新审稿人意见，系统将调用历史发表高胜率语料，在此处自动呈现包含 4 步修辞动作的标准回辩信草稿。</p>
+          </div>
+
+          <div id="studio-result-card" class="glass-panel p-6 rounded-xl flex flex-col gap-5 hidden"></div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- VIEW 4: PRE-SUBMISSION SCANNER (SUGGESTION 2 - DEFENSE MATRIX) -->
+    <section id="view-scanner" class="view-panel hidden flex flex-col gap-6">
+      <div class="glass-panel p-6 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="p-2 rounded-lg bg-[#172019] text-[#5FA369] border border-[#243527]">
+            <i data-lucide="shield-check" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h2 class="text-base font-semibold text-[var(--text-primary)] flex items-center gap-2">
+              投稿前审稿盲区自查与先验防御工作台 (Pre-submission Scanner)
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded border border-[var(--card-border)] bg-[var(--bg-tertiary)] text-[var(--text-secondary)] font-normal">Preemptive Defense</span>
+            </h2>
+            <p class="text-xs text-[var(--text-secondary)]">勾选新论文采用的研究范式特征，逆向排查审稿人必咬的致命漏洞，提前在正文筑起防御工事</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-4 bg-[var(--bg-tertiary)] px-4 py-2 rounded-lg border border-[var(--card-border)]">
+          <div class="flex flex-col">
+            <span class="text-[10px] text-[var(--text-secondary)] uppercase font-semibold">正文防御完备度</span>
+            <span id="scanner-score-text" class="text-sm font-mono font-bold text-[#5FA369]">0% (0/0)</span>
+          </div>
+          <button onclick="window.exportDefensePlan()" class="px-3 py-1.5 rounded-lg btn-terracotta text-xs font-semibold flex items-center gap-1.5 whitespace-nowrap">
+            <i data-lucide="download" class="w-3.5 h-3.5"></i>
+            <span>导出施工清单 (.md)</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="glass-panel p-4 rounded-xl flex flex-col gap-2.5">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-semibold text-[var(--text-primary)] flex items-center gap-1.5">
+            <i data-lucide="check-square" class="w-3.5 h-3.5 text-[#DE7E5D]"></i>
+            第一步：勾选您新论文包含的研究范式与方法特征 (可多选)
+          </span>
+          <button onclick="window.selectAllParadigms(true)" class="text-[11px] text-[#DE7E5D] hover:underline">一键全选所有范式</button>
+        </div>
+
+        <div id="paradigm-chips-container" class="flex flex-wrap gap-2 pt-1"></div>
+      </div>
+
+      <div id="scanner-cards-container" class="flex flex-col gap-5"></div>
+    </section>
+
+    <!-- VIEW 5: REBUTTAL STRATEGY VAULT -->
+    <section id="view-vault" class="view-panel hidden flex flex-col gap-6">
+      <div class="glass-panel p-6 rounded-xl flex flex-col gap-2">
+        <div class="flex items-center gap-3">
+          <div class="p-2 rounded-lg bg-[var(--bg-tertiary)] text-[var(--text-primary)]">
+            <i data-lucide="book-open" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h2 class="text-base font-semibold text-[var(--text-primary)]">顶刊返修学术修辞兵法宝库 (Rebuttal Vault)</h2>
+            <p class="text-xs text-[var(--text-secondary)]">基于 181 条实战对局提炼的应用语言学与教育技术顶级期刊攻防标准范式</p>
+          </div>
+        </div>
+      </div>
+      <div id="vault-container" class="grid grid-cols-1 md:grid-cols-2 gap-5"></div>
+    </section>
+
+    <!-- VIEW 6: JOURNAL ANALYTICS -->
+    <section id="view-analytics" class="view-panel hidden flex flex-col gap-6">
+      <div class="glass-panel p-6 rounded-xl flex flex-col gap-2">
+        <div class="flex items-center gap-3">
+          <div class="p-2 rounded-lg bg-[var(--bg-tertiary)] text-[var(--text-primary)]">
+            <i data-lucide="bar-chart-2" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h2 class="text-base font-semibold text-[var(--text-primary)]">发表与审稿多维数据洞察 (Corpus Analytics)</h2>
+            <p class="text-xs text-[var(--text-secondary)]">各顶刊审稿关切分布、修辞策略采纳率与返修轮次演变规律</p>
+          </div>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="analytics-container"></div>
+    </section>
+
+  </main>
+
+  <!-- BOOKMARK DRAWER -->
+  <div id="bookmark-drawer" class="fixed inset-y-0 right-0 w-full sm:w-[460px] bg-[var(--card-bg)] border-l border-[var(--card-border)] p-5 transform translate-x-full transition-transform duration-300 ease-out z-50 flex flex-col gap-4 shadow-xl">
+    <div class="flex items-center justify-between border-b border-[var(--card-border)] pb-3">
+      <div class="flex items-center gap-2">
+        <i data-lucide="bookmark" class="w-4 h-4 text-[#DE7E5D]"></i>
+        <h3 class="font-semibold text-sm text-[var(--text-primary)]">我的返修灵感备选库</h3>
+        <span id="drawer-bookmark-count" class="text-xs font-mono text-[var(--text-secondary)] bg-[var(--bg-tertiary)] px-2 py-0.5 rounded border border-[var(--card-border)]">0 条</span>
+      </div>
+      <button onclick="window.toggleBookmarkDrawer()" class="p-1 rounded-lg text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] transition-all">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+    </div>
+    <p class="text-xs text-[var(--text-secondary)]">您可以将浏览中发现的绝妙回辩实录加入此处，构思完成时一键打包导出专属返修备忘录。</p>
+    <div class="flex items-center gap-2">
+      <button onclick="window.exportBookmarkedMarkdown()" class="flex-1 py-2 rounded-lg btn-terracotta text-xs font-semibold transition-all flex items-center justify-center gap-1.5">
+        <i data-lucide="download" class="w-3.5 h-3.5"></i>
+        <span>导出选中的灵感清单为 .md</span>
+      </button>
+      <button onclick="window.clearAllBookmarks()" class="px-3 py-2 rounded-lg btn-neutral text-xs font-medium transition-all">
+        清空
+      </button>
+    </div>
+    <div id="bookmark-list" class="flex-1 overflow-y-auto pr-1 flex flex-col gap-3"></div>
+  </div>
+
+  <!-- CLI MODAL -->
+  <div id="cli-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="glass-panel max-w-xl w-full p-6 rounded-xl border border-[var(--card-border)] flex flex-col gap-4 shadow-xl">
+      <div class="flex items-center justify-between border-b border-[var(--card-border)] pb-3">
+        <div class="flex items-center gap-2">
+          <div class="p-1.5 rounded bg-[var(--bg-tertiary)] text-[#DE7E5D]">
+            <i data-lucide="terminal" class="w-4 h-4"></i>
+          </div>
+          <h3 class="font-semibold text-sm text-[var(--text-primary)]">方案 B 终端 CLI 极速检索工具</h3>
+        </div>
+        <button onclick="window.toggleCliModal()" class="p-1 rounded-lg text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] transition-all">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <p class="text-xs text-[var(--text-secondary)]">
+        学术写作与修稿时，无需切出编辑环境，直接在终端执行命令行即可秒级召回历史案例与修辞金句：
+      </p>
+      <div class="bg-[var(--bg-tertiary)] rounded-lg p-4 border border-[var(--card-border)] font-mono text-xs text-[var(--text-primary)] space-y-2 select-all">
+        <div><span class="text-[var(--text-muted)]"># 1. 极速单行语义检索:</span></div>
+        <div class="text-[#DE7E5D]">python review_corpus_system/cli.py "sample size justification"</div>
+        <div><span class="text-[var(--text-muted)]"># 2. 指定期刊与分类，并导出 Markdown 手册:</span></div>
+        <div class="text-[#DE7E5D]">python review_corpus_system/cli.py "theory" -j System --export my_theory.md</div>
+        <div><span class="text-[var(--text-muted)]"># 3. 开启沉浸式终端交互 Shell:</span></div>
+        <div class="text-[#DE7E5D]">python review_corpus_system/cli.py -i</div>
+      </div>
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="window.copyText('python review_corpus_system/cli.py -i', '已复制终端交互命令')" class="px-4 py-2 rounded-lg btn-terracotta text-xs font-semibold transition-all">
+          复制 CLI 交互命令
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 text-xs font-medium">
+    <i data-lucide="check" class="w-4 h-4 text-[#5FA369]"></i>
+    <span id="toast-text">已复制到剪贴板</span>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
