@@ -290,14 +290,15 @@ export function resetGraphZoom() {
 
 export function toggleSimulation() {
   const btn = document.getElementById("btn-toggle-sim");
+  if (!btn) return;
   if (isSimRunning) {
     d3Simulation.stop();
     isSimRunning = false;
-    btn.innerHTML = `<i data-lucide="play" class="w-3.5 h-3.5"></i><span>激活引力</span>`;
+    btn.innerHTML = `<i data-lucide="play" class="w-3.5 h-3.5"></i><span id="sim-btn-text" class="hidden sm:inline">激活引力</span>`;
   } else {
     d3Simulation.alpha(0.3).restart();
     isSimRunning = true;
-    btn.innerHTML = `<i data-lucide="pause" class="w-3.5 h-3.5"></i><span>固定引力</span>`;
+    btn.innerHTML = `<i data-lucide="pause" class="w-3.5 h-3.5"></i><span id="sim-btn-text" class="hidden sm:inline">固定引力</span>`;
   }
   if (window.lucide) lucide.createIcons();
 }
