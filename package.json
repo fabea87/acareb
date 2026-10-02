@@ -7,10 +7,15 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "cf:login": "wrangler login",
+    "cf:whoami": "wrangler whoami",
+    "cf:dev": "wrangler dev",
+    "deploy:cf": "node scripts/deploy_cf.js",
     "update-corpus": "node scripts/update-corpus.js",
     "setup-hook": "python scripts/setup_git_hook.py"
   },
   "devDependencies": {
-    "vite": "^6.2.0"
+    "vite": "^6.2.0",
+    "wrangler": "^4.147.0"
   }
 }
